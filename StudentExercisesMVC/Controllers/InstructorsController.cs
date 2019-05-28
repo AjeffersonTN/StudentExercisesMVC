@@ -7,117 +7,54 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using StudentExercisesMVC.Models;
+using StudentExercisesMVC.Models.StudentCreateViewModel;
 using StudentExercisesMVC.Models.ViewModels;
-
+using StudentExercisesMVC.Respositories;
 
 namespace StudentExercisesMVC.Controllers
 {
     public class InstructorsController : Controller
     {
-        private readonly IConfiguration _config;
-
-        public InstructorsController(IConfiguration config)
-        {
-            _config = config;
-        }
-
-        public SqlConnection Connection
-        {
-            get
-            {
-                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            }
-        }
+       
         // GET: Instructors
-        public ActionResult Index()
+        public ActionResult Index(string _orderBy, string _sortDirection)
         {
-            using (SqlConnection conn = Connection)
+            string currentSort = "";
+
+            if (_sortDirection == null)
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT i.Id,
-                            i.FirstName,
-                            i.LastName,
-                            i.SlackHandle,
-                            i.Specialty,
-                            i.CohortId
-                        FROM Instructor i
-                    ";
-                    SqlDataReader reader = cmd.ExecuteReader();
+                ViewData["sortDirection"] = "desc";
+                currentSort = "asc";
 
-                    List<Instructor> instructors = new List<Instructor>();
-                    while (reader.Read())
-                    {
-                        Instructor instructor = new Instructor
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-
-                        };
-
-                        instructors.Add(instructor);
-                    }
-
-                    reader.Close();
-
-                    return View(instructors);
-                }
             }
+            else if (_sortDirection == "asc")
+            {
+                ViewData["sortDirection"] = "desc";
+                currentSort = "asc";
+
+            }
+            else if (_sortDirection == "desc")
+            {
+                ViewData["sortDirection"] = "asc";
+                currentSort = "desc";
+            }
+
+            var students = InstructorRepository.GetInstructors(_orderBy, currentSort);
+
+            return View(students);
         }
+        
 
             // GET: Instructors/Details/5
             public ActionResult Details(int id)
             {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                    SELECT n.Id,
-                        n.FirstName,
-                        n.LastName,
-                        n.SlackHandle,
-                        n.Specialty,
-                        n.CohortId
-                     FROM Instructor n
-                     WHERE n.Id = @InstructorId
-                    ";
-                    cmd.Parameters.Add(new SqlParameter("@InstructorId", id));
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Instructor instructor = null;
-                    if (reader.Read())
-                    {
-                        instructor = new Instructor
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
-                    }
-
-                    reader.Close();
-
-                    return View(instructor);
-                }
+                var instructor = InstructorRepository.GetInstructor(id);
+                return View(instructor);
             }
-        }
-
         // GET: Instructors/Create
         public ActionResult Create()
         {
-            InstructorCreateViewModel model = new InstructorCreateViewModel(Connection);
+            InstructorCreateViewModel model = new InstructorCreateViewModel();
             return View(model);
         }
 
@@ -126,169 +63,50 @@ namespace StudentExercisesMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([FromForm] InstructorCreateViewModel model)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"INSERT INTO Instructor (FirstName, LastName, SlackHandle, Specialty, CohortId)         
-                                         OUTPUT INSERTED.Id                                                       
-                                         VALUES (@firstName, @lastName, @handle, @specialty, @iId)";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", model.Instructor.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@lastName", model.Instructor.LastName));
-                    cmd.Parameters.Add(new SqlParameter("@handle", model.Instructor.SlackHandle));
-                    cmd.Parameters.Add(new SqlParameter("@specialty", model.Instructor.Specialty));
-                    cmd.Parameters.Add(new SqlParameter("@iId", model.Instructor.CohortId));
-
-                    int newId = (int)cmd.ExecuteScalar();
-                    return RedirectToAction(nameof(Index));
-                }
-            }
+            var instructor = InstructorRepository.CreateInstructor(model.Instructor);
+            return View(model);
         }
 
         // GET: Instructors/Edit/5
         public ActionResult Edit(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                    SELECT n.Id,
-                        n.FirstName,
-                        n.LastName,
-                        n.SlackHandle,
-                        n.Specialty,
-                        n.CohortId
-                     FROM Instructor n
-                     WHERE n.Id = @InstructorId
-                    ";
-                    cmd.Parameters.Add(new SqlParameter("@InstructorId", id));
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Instructor instructor = null;
-                    if (reader.Read())
-                    {
-                        instructor = new Instructor
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
-                    }
-
-                    reader.Close();
-
-                    return View(instructor);
-                }
-            }
+            var model = new InstructorEditViewModel(id);
+            return View(model);
         }
 
         // POST: Instructors/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Instructor instructor)
+        public ActionResult Edit(int id, InstructorEditViewModel model)
         {
-            
-
-            using (SqlConnection conn = Connection)
+            try
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"UPDATE Instructor
-                                            SET FirstName = @FirstName,
-                                                LastName = @LastName,
-                                                SlackHandle = @SlackHandle,
-                                                Specialty = @Specialty,                                                       
-                                                CohortId = @CohortId
-                                            WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@FirstName", instructor.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@LastName", instructor.LastName));
-                    cmd.Parameters.Add(new SqlParameter("@SlackHandle", instructor.SlackHandle));
-                    cmd.Parameters.Add(new SqlParameter("@Specialty", instructor.Specialty));
-                    cmd.Parameters.Add(new SqlParameter("@CohortId", instructor.CohortId));                       
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    return RedirectToAction(nameof(Index));
-                }
-
+                model.Instructor.Id = id;
+                InstructorRepository.EditInstructor(model.Instructor);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                return View(model);
             }
 
-            
         }
       
 
         // GET: Instructors/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult DeleteConfirm(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                    SELECT n.Id,
-                        n.FirstName,
-                        n.LastName,
-                        n.SlackHandle,
-                        n.Specialty,
-                        n.CohortId
-                     FROM Instructor n
-                     WHERE n.Id = @InstructorId
-                    ";
-                    cmd.Parameters.Add(new SqlParameter("@InstructorId", id));
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Instructor instructor = null;
-                    if (reader.Read())
-                    {
-                        instructor = new Instructor
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
-                    }
-
-                    reader.Close();
-
-                    return View(instructor);
-                }
-            }
+            var instructor = InstructorRepository.GetInstructor(id);
+            return View(instructor);
         }
 
         // POST: Instructors/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete([FromForm] int id)
         {
-            // TODO: Add delete logic here
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"DELETE FROM Instructor WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    return RedirectToAction(nameof(Index));
-
-                }
-            }
+            InstructorRepository.DeleteInstructor(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

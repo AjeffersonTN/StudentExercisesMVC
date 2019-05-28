@@ -2,22 +2,23 @@
 using StudentExercisesMVC.Respositories;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StudentExercisesMVC.Models.ViewModels
+namespace StudentExercisesMVC.Models.StudentCreateViewModel
 {
-    public class InstructorCreateViewModel
+    public class InstructorEditViewModel
     {
-        // A single student
-        public Instructor Instructor { get; set; } = new Instructor();
+        // A single instructor
+        public Instructor Instructor { get; set; }
 
         // All cohorts
         public List<SelectListItem> Cohorts;
 
-        public InstructorCreateViewModel()
+        public InstructorEditViewModel() { }
+        public InstructorEditViewModel(int id)
         {
+            Instructor = InstructorRepository.GetInstructor(id);
             BuildCohortOptions();
         }
 
