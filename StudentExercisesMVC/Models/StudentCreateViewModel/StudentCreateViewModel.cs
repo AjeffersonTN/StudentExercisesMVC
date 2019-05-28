@@ -1,4 +1,4 @@
-﻿using CohortExercisesMVC.Respositories;
+﻿using StudentExercisesMVC.Respositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StudentExercisesMVC.Repositories;
 using System;

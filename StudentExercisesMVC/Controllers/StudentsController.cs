@@ -100,14 +100,8 @@ namespace StudentExercisesMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete([FromForm] int id)
         {
-            if (StudentRepository.DeleteStudent(id))
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction(nameof(Details), new { id = id });
-            }
+            StudentRepository.DeleteStudent(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

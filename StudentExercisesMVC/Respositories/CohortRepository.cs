@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using StudentExercisesMVC.Models;
 
-namespace CohortExercisesMVC.Respositories
+namespace StudentExercisesMVC.Respositories
 {
     public class CohortRepository
     {
@@ -126,14 +126,13 @@ namespace CohortExercisesMVC.Respositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                            UPDATE Cohort
-                            SET Id = @id,
-                            Designation = @designation                                                   
+                    cmd.CommandText = @"UPDATE Cohort
+                            SET Designation = @designation                                                   
                             WHERE Id = @CohortId
                         ";
                     cmd.Parameters.Add(new SqlParameter("@CohortId", cohort.Id));
-                    cmd.Parameters.Add(new SqlParameter("@dsignation", cohort.Designation));                  
+                    cmd.Parameters.Add(new SqlParameter("@designation", cohort.Designation));
+                    cmd.Parameters.Add(new SqlParameter("@id", cohort.Id));
 
                     cmd.ExecuteNonQuery();
                 }
@@ -142,11 +141,9 @@ namespace CohortExercisesMVC.Respositories
 
 
         // GET: Cohort/Delete/5
-        public static bool DeleteCohort(int id)
+        public static void DeleteCohort(int id)
         {
-            try
-            {
-
+            
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
@@ -160,19 +157,11 @@ namespace CohortExercisesMVC.Respositories
                         cmd.Parameters.Add(new SqlParameter("@CohortId", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected == 0) return false;
-                        return true;
+                        
+                        return;
                     }
                 }
 
-            }
-            catch
-            {
-                return false;
-
-
-            }
-            
            
         }
 

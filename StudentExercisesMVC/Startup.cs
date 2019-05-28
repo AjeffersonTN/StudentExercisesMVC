@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CohortExercisesMVC.Respositories;
+using StudentExercisesMVC.Respositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StudentExercisesMVC.Repositories;
-using StudentExercisesMVC.Respositories;
 
 namespace StudentExercisesMVC
 {
@@ -51,7 +50,7 @@ namespace StudentExercisesMVC
 
             StudentRepository.SetConfig(Configuration);
             CohortRepository.SetConfig(Configuration);
-            //ExerciseRepository.SetConfig(Configuration);
+            ExerciseRepository.SetConfig(Configuration);
             //InstructorRepository.SetConfig(Configuration);
 
             app.UseStaticFiles();

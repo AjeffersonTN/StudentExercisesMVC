@@ -101,10 +101,9 @@ namespace StudentExercisesMVC.Repositories
             }
         }
 
-        public static bool DeleteStudent(int id)
+        public static void DeleteStudent(int id) //bool was there instead of void
         {
-            try
-            {
+           
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
@@ -113,17 +112,13 @@ namespace StudentExercisesMVC.Repositories
                         cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected == 0) return false;
-                        return true;
+                       cmd.ExecuteNonQuery();
+
+                    return;
                     }
                 }
-            }
-            catch
-            {
-                return false;
-            }
-        }
+            
+         }
 
         public static void UpdateStudent(Student student)
         {

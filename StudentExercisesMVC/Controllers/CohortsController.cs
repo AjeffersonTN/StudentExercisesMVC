@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using CohortExercisesMVC.Respositories;
+using StudentExercisesMVC.Respositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -84,13 +84,9 @@ namespace StudentExercisesMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete([FromForm] int id)
         {
-            if (CohortRepository.DeleteCohort(id))
-            {
-                return RedirectToAction(nameof(Index));
-            } else {
-                return RedirectToAction(nameof(Index));
-            }
-          
+            CohortRepository.DeleteCohort(id);
+            return RedirectToAction(nameof(Index));
+         
         }
     }
 }
