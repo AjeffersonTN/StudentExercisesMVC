@@ -87,21 +87,31 @@ namespace StudentExercisesMVC.Controllers
                 return View(model);
             }
         }
-
+      
         // GET: Students/Delete/5
-        public ActionResult DeleteConfirm(int id)
+        public ActionResult Delete(int id)
         {
             var student = StudentRepository.GetStudent(id);
             return View(student);
         }
 
-        // POST: Students/Delete/5
-        [HttpPost]
+        //POST: Students/Delete/5
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete([FromForm] int id)
+        public ActionResult DeleteConfirmed(int id)
         {
-            StudentRepository.DeleteStudent(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                StudentRepository.DeleteExerciseFromStudent(id);
+                StudentRepository.DeleteStudent(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch 
+            {
+                return RedirectToAction(nameof(Details));
+            }
+            //StudentRepository.DeleteStudent(id);
+            //return RedirectToAction(nameof(Index));
         }
     }
 }

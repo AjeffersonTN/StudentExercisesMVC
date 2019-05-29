@@ -86,6 +86,7 @@ namespace StudentExercisesMVC.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                   
                     cmd.CommandText = @"INSERT INTO Student (FirstName, LastName, SlackHandle, CohortId)         
                                          OUTPUT INSERTED.Id                                                       
                                          VALUES (@firstName, @lastName, @handle, @cId)";
@@ -100,25 +101,49 @@ namespace StudentExercisesMVC.Repositories
                 }
             }
         }
-
-        public static void DeleteStudent(int id) //bool was there instead of void
+        public static int DeleteExerciseFromStudent(int id) 
         {
-           
-                using (SqlConnection conn = Connection)
+
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                       cmd.ExecuteNonQuery();
+                    cmd.CommandText = @"DELETE FROM StudentExercises WHERE StudentExercises.StudentId = @id";
 
-                    return;
-                    }
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    return rowsAffected;
                 }
-            
-         }
+            }
+
+        }
+
+        public static int DeleteStudent(int id) //bool was there instead of void
+        {
+
+            using ( SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+
+                    cmd.CommandText = @"DELETE FROM Student WHERE Student.Id = @id";
+                        
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    return rowsAffected;
+                }
+            }
+
+        }
 
         public static void UpdateStudent(Student student)
         {
