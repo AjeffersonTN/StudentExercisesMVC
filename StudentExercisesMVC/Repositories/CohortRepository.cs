@@ -141,7 +141,7 @@ namespace StudentExercisesMVC.Respositories
 
 
         // GET: Cohort/Delete/5
-        public static void DeleteCohort(int id)
+        public static int DeleteCohort(int id)
         {
             
                 using (SqlConnection conn = Connection)
@@ -151,14 +151,14 @@ namespace StudentExercisesMVC.Respositories
                     {
                         cmd.CommandText = @"
                             DELETE                                                        
-                            FROM Cohort c
-                            WHERE c.Id = @CohortId
+                            FROM Cohort
+                            WHERE Cohort.Id = @CohortId
                         ";
                         cmd.Parameters.Add(new SqlParameter("@CohortId", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
                         
-                        return;
+                        return rowsAffected;
                     }
                 }
 

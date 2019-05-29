@@ -94,19 +94,26 @@ namespace StudentExercisesMVC.Controllers
       
 
         // GET: Instructors/Delete/5
-        public ActionResult DeleteConfirm(int id)
+        public ActionResult Delete(int id)
         {
             var instructor = InstructorRepository.GetInstructor(id);
             return View(instructor);
         }
 
         // POST: Instructors/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete([FromForm] int id)
+        public ActionResult DeleteConfirmed(int id)
         {
+            try
+            {
             InstructorRepository.DeleteInstructor(id);
             return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction(nameof(Details));
+            }
         }
     }
 }

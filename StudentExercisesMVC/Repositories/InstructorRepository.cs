@@ -104,7 +104,7 @@ namespace StudentExercisesMVC.Respositories
             }
         }
 
-        public static void DeleteInstructor(int id) //bool was there instead of void
+        public static int DeleteInstructor(int id) 
         {
 
             using (SqlConnection conn = Connection)
@@ -112,12 +112,12 @@ namespace StudentExercisesMVC.Respositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"DELETE FROM Instructor WHERE Id = @id";
+                    cmd.CommandText = @"DELETE FROM Instructor WHERE Instructor.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                    cmd.ExecuteNonQuery();
+                    int rowsAffected = cmd.ExecuteNonQuery();
 
-                    return;
+                    return rowsAffected;
                 }
             }
 

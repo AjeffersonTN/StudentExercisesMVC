@@ -73,20 +73,27 @@ namespace StudentExercisesMVC.Controllers
         }
 
         // GET: Cohort/Delete/5
-        public ActionResult DeleteConfirm(int id)
+        public ActionResult Delete(int id)
         {
             var cohort = CohortRepository.GetCohort(id);
             return View(cohort);
         }
 
         // POST: Cohort/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete([FromForm] int id)
+        public ActionResult DeleteConfirmed(int id)
         {
+            try
+            {
             CohortRepository.DeleteCohort(id);
-            return RedirectToAction(nameof(Index));
-         
+            return RedirectToAction(nameof(Index));        
+
+            }
+            catch
+            {
+            return RedirectToAction(nameof(Details));
+            }
         }
     }
 }
